@@ -3,6 +3,7 @@ package com.ty.service;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,32 +12,22 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.ty.dao.InsertInfo;
 import com.ty.dto.User;
-
-@WebServlet("/signup")
-public class SignUpController extends HttpServlet {
+@WebServlet("/login")
+public class LoginController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String Id = req.getParameter("id");
-		String name = req.getParameter("name");
 		String email = req.getParameter("email");
-		String phnumber = req.getParameter("phonenumber");
 		String password = req.getParameter("pass");
 		
-		User user = new User();
-		user.setId(Integer.parseInt(Id));
-		user.setName(name);
-		user.setEmail(email);
-		user.setPhoneNumber(Long.parseLong(phnumber));
-		user.setPassword(password);
-		
 		InsertInfo dao = new InsertInfo();
-		boolean res = dao.insertUserinfo(user);
-		
-		 PrintWriter output = resp.getWriter();
-		 if (res) {
-			output.print("Insert Operation is Done");
+		User user =  dao.validateUserByEmail(email, password);
+		if (user!=null) {
+			RequestDispatcher dispatcher= req.getRequestDispatcher("home");
+			dispatcher.forward(req, resp);
 		} else {
-			output.print("Insert Operation is Not Done");
+			RequestDispatcher dispatcher = req.getRequestDispatcher("Login.html");
+			dispatcher.forward(req, resp);
 		}
+		
 	}
 }
